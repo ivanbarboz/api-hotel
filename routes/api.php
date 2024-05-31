@@ -28,7 +28,8 @@ Route::post('departments', [DepartmentController::class, 'create']);
 
 //RUTAS PARA HOTELES
 Route::get('hotels', [HotelController::class, 'index']);
-Route::post('hotels', [HotelController::class, 'create']);
+Route::post('hotels', [HotelController::class, 'store']);
+//Route::post('hotels', [HotelController::class, 'create']);
 Route::put('hotels/{hotel}',[HotelController::class, 'update']);
 Route::patch('hotels/{hotel}',[HotelController::class, 'update']);
 Route::delete('hotels/{hotel}', [HotelController::class, 'delete']);

@@ -20,3 +20,4 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::post('/hotels', [HotelController::class, 'store']);

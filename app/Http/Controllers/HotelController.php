@@ -8,6 +8,7 @@ use App\Models\HotelPhoto;
 use App\Services\HotelService;
 use App\Services\PhotoService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class HotelController extends Controller
 {
@@ -22,18 +23,55 @@ class HotelController extends Controller
         return HotelResource::collection($hotels);
     }
     
-    public function create(Request $request)
+    public function store(Request $request)
     {
-        $request->validate([
-            // Validación de otros campos del hotel
-            'hotel_fotos' => 'required|array',
-            'hotel_fotos.*' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-        ]);
-        // Utilizar el servicio para crear el hotel y cargar las fotos
-        $hotel = $this->hotelService->createHotelWithPhotos($request->all());
-        return response()->json(['message' => 'Hotel y fotos creados correctamente.', 'hotel' => $hotel]);
+        $hotel = Hotel::create($request->all());
+        foreach ($request->photos as $base64Photo) {
+            $decodedImage = base64_decode($base64Photo);
+            $fileName = uniqid() . '.jpg'; // Usa una extensión válida (ajústala según el tipo de imagen)
+
+            Storage::put('public/hotels/' . $fileName, $decodedImage);
+            HotelPhoto::create([
+                'uri' => 'hotels/' . $fileName, // Almacena solo la ruta relativa
+                'hotel_id' => $hotel->id
+            ]);
+        }
+
+        return response()->json(['hotel' => $hotel, 'message' => 'Hotel creado con éxito'], 201);
     }
 
+
+/*
+    public function create(Request $request)
+{
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|string|email|max:255',
+        'address' => 'required|string|max:255',
+        'price' => 'required|numeric',
+        'roomType' => 'required|string|max:255',
+        'phoneNumber' => 'required|string|max:20',
+        'department_id' => 'required|integer|exists:departments,id',
+        'photos.*' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // Validar archivos de imagen
+    ]);
+
+    $hotel = Hotel::create($request->all());
+
+    if ($request->hasFile('photos')) {
+        foreach ($request->file('photos') as $photo) {
+            $filePath = $photo->store('public/hotels');
+            $fileName = basename($filePath);
+
+            HotelPhoto::create([
+                'uri' => 'hotels/' . $fileName,
+                'hotel_id' => $hotel->id
+            ]);
+        }
+    }
+
+    return response()->json(['hotel' => $hotel, 'message' => 'Hotel creado con éxito'], 201);
+}
+*/
 
 
     public function update(Hotel $hotel, Request $request)
