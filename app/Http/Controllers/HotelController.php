@@ -41,7 +41,7 @@ class HotelController extends Controller
     }
 
 
-/*
+
     public function create(Request $request)
 {
     $request->validate([
@@ -71,7 +71,7 @@ class HotelController extends Controller
 
     return response()->json(['hotel' => $hotel, 'message' => 'Hotel creado con éxito'], 201);
 }
-*/
+
 
 
     public function update(Hotel $hotel, Request $request)
